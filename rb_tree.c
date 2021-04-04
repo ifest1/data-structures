@@ -87,6 +87,11 @@ void rb_insert_fixup(Tree *tree, Node *x) {
     }
     tree->root->color = false;
 }
+/*
+void rb_delete_fixup(Tree *tree, Node *x) {
+
+}
+*/
 
 void insert_node(Tree *tree, Node *new_node) {
     Node **current = malloc(sizeof(Node));
@@ -159,7 +164,7 @@ Node *tree_predecessor(Node *x) {
 }
 
 void transplant(Tree *tree, Node *u, Node *v) {
-    if (!(u->parent)) {
+    if (u->parent == tree->nil) {
         tree->root = v;
         return;
     }
@@ -167,32 +172,45 @@ void transplant(Tree *tree, Node *u, Node *v) {
     
     else u->parent->right = v;
     
-    if (v) v->parent = u->parent;
+    v->parent = u->parent;
 }
 
 void delete_node(Tree *tree, Node *x) {
     Node *y = (Node *)malloc(sizeof(Node));
+    Node *t = (Node *)malloc(sizeof(Node));
+    bool original_color;
 
-    if (!(x->left)) { 
+    y = x;
+    y_original_color = y->color;
+
+    if (x->left == tree->nil) { 
+        t = x->right;
         transplant(tree, x, x->right);
         return;
     }
-    else if (!(x->right)) { 
+    else if (x->right == tree->nil) {
+        t = x->left; 
         transplant(tree, x, x->left);
         return;
     }
     else {
         y = tree_minimum(x->right);
-        
-        if (y != x->parent) {
+        y_original_color = y->color;
+        t = y->right;
+
+        if (y->parent == x) t->parent = y;
+        else {
             transplant(tree, y, y->right);
             y->right = x->right;
-            y->right->parent = y;
+            y->right->parent = y
         }
-        transplant(tree, x, y);
         y->left = x->left;
         y->left->parent = y;
+        y->color = x->color;
     }  
+    if (y_original_color == false) {
+        //rb_delete_fixup(tree, x);
+    }
 }
 
 
